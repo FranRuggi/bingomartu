@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}🎵 Cartón de {{ jugador.nombre }}{% endblock %}
+
+{% block content %}
+{% set total_marcadas = jugador.marcadas | length %}
+
+<div class="carton-header">
+  <p class="titulo-carton">✨ Bingo Musical · {{ nombre_cumple }} 💜</p>
+  <h1 class="nombre-jugador">{{ jugador.nombre }}</h1>
+  <p class="instruccion-carton">Tocá las celdas cuando escuchés la canción</p>
+</div>
+
+<div class="grilla" id="grilla">
+  {% for cancion in jugador.carton %}
+  {% set partes = cancion.split(' - ', 1) %}
+  <div class="celda {% if cancion in jugador.marcadas %}marcada{% endif %}"
+       data-cancion="{{ cancion }}"
+       onclick="toggleMarca(this)"
+       title="{{ cancion }}">
+    <div class="texto-celda">
+      <span class="artista-texto">{{ partes[0] }}</span>
+      {% if partes | length > 1 %}
+      <span class="cancion-texto">{{ partes[1] }}</span>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="contador">
+  <span class="numero" id="contador-num">{{ total_marcadas }}</span>
+  <span class="contador-label">/16 canciones marcadas</span>
+</div>
+
+<div id="bingo-message" class="bingo-message {% if total_marcadas >= 16 %}visible{% endif %}">
+  <p class="bingo-emoji">🎉✨💜</p>
+  <h2>¡Completaste tu cartón!</h2>
+  <p class="bingo-sub">¡Gritá que sos la era ganadora!</p>
+  <button class="btn-bingo" onclick="cantarBingo()" id="btn-bingo">
+    🎤 ¡BINGO, SOY LA ERA GANADORA!
+  </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const JUGADOR_NOMBRE = {{ jugador.nombre | tojson }};
+</script>
+{% endblock %}

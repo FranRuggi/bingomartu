@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}🎵 Panel del Host — Bingo Musical{% endblock %}
+
+{% block content %}
+<div class="host-header">
+  <h1>🎵 Panel del Host</h1>
+  <p class="host-subtitulo">Bingo Musical · Felices 24, {{ nombre_cumple }} 💜</p>
+  <p class="host-hint">Se actualiza automáticamente cada 3 segundos</p>
+</div>
+
+<div class="host-controls">
+  <button class="btn-danger" onclick="resetearJuego()">🔄 Reiniciar juego</button>
+</div>
+
+<!-- Alertas de BINGO -->
+<div class="seccion seccion-bingo">
+  <h2>🎤 Cantos de BINGO</h2>
+  <div id="alertas-bingo">
+    <div class="no-ganadores">Aún no hay ganadores 🎶</div>
+  </div>
+</div>
+
+<!-- Lista de jugadores -->
+<div class="seccion">
+  <h2>👥 Jugadores — <span id="contador-jugadores">0</span> en juego</h2>
+  <div id="jugadores-lista">
+    <div class="empty-state">Ningún jugador aún 🎵</div>
+  </div>
+</div>
+
+<!-- Checklist de canciones -->
+<div class="seccion">
+  <h2>🎵 Canciones — <span id="contador-sonadas">0</span>/{{ canciones | length }} sonadas</h2>
+  <ul class="canciones-lista">
+    {% for cancion in canciones %}
+    {% set partes = cancion.split(' - ', 1) %}
+    <li class="cancion-item" data-cancion="{{ cancion }}" onclick="toggleSonada(this)">
+      <input type="checkbox" onclick="event.stopPropagation()" tabindex="-1">
+      <span class="cancion-item-texto">
+        <span class="cancion-artista">{{ partes[0] }}</span>
+        {% if partes | length > 1 %}
+        <span class="cancion-titulo"> — {{ partes[1] }}</span>
+        {% endif %}
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<!-- Modal ver cartón de jugador -->
+<div class="modal-overlay" id="modal-carton" onclick="if(event.target===this) cerrarModal()">
+  <div class="modal-box">
+    <h3 id="modal-titulo">Cartón</h3>
+    <div class="leyenda-modal">
+      <div class="leyenda-item">
+        <div class="dot dot-valida"></div>
+        <span>Marcada ✓</span>
+      </div>
+      <div class="leyenda-item">
+        <div class="dot dot-invalida"></div>
+        <span>Marcada sin sonar ✗</span>
+      </div>
+      <div class="leyenda-item">
+        <div class="dot dot-libre"></div>
+        <span>Sin marcar</span>
+      </div>
+    </div>
+    <div class="grilla-host" id="modal-grilla"></div>
+    <button class="btn-secondary btn-full" onclick="cerrarModal()">Cerrar</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Arrancar polling del host
+  document.addEventListener('DOMContentLoaded', iniciarPollingHost);
+</script>
+{% endblock %}
